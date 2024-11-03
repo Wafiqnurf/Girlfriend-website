@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Player - Netflix Clone</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #000;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .video-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+      }
+
+      .custom-video-player {
+        width: 100%;
+        max-width: 1200px;
+        position: relative;
+      }
+
+      video {
+        width: 100%;
+        height: auto;
+        max-height: 90vh;
+      }
+
+      .video-controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .custom-video-player:hover .video-controls {
+        opacity: 1;
+      }
+
+      .control-btn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .progress-bar {
+        flex-grow: 1;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        position: relative;
+      }
+
+      .progress {
+        height: 100%;
+        background: #e50914;
+        width: 0;
+      }
+
+      .time-display {
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        min-width: 100px;
+        text-align: center;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      @media (max-width: 768px) {
+        .video-controls {
+          padding: 10px;
+        }
+
+        .time-display {
+          font-size: 12px;
+          min-width: 80px;
+        }
+
+        .control-btn {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="back-btn" onclick="window.location.href='index.html'">
+      ← Back
+    </button>
+
+    <div class="video-container">
+      <div class="custom-video-player">
+        <video id="mainVideo">
+          <source src="images/video/1.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div class="video-controls">
+          <button class="control-btn play-pause">▶</button>
+          <div class="progress-bar">
+            <div class="progress"></div>
+          </div>
+          <span class="time-display">0:00 / 0:00</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const video = document.getElementById("mainVideo");
+      const playPauseBtn = document.querySelector(".play-pause");
+      const progressBar = document.querySelector(".progress-bar");
+      const progress = document.querySelector(".progress");
+      const timeDisplay = document.querySelector(".time-display");
+
+      // Play/Pause functionality
+      function togglePlayPause() {
+        if (video.paused) {
+          video.play();
+          playPauseBtn.textContent = "⏸";
+        } else {
+          video.pause();
+          playPauseBtn.textContent = "▶";
+        }
+      }
+
+      playPauseBtn.addEventListener("click", togglePlayPause);
+      video.addEventListener("click", togglePlayPause);
+
+      // Update progress bar
+      video.addEventListener("timeupdate", () => {
+        const percentage = (video.currentTime / video.duration) * 100;
+        progress.style.width = percentage + "%";
+
+        // Update time display
+        const currentMinutes = Math.floor(video.currentTime / 60);
+        const currentSeconds = Math.floor(video.currentTime % 60);
+        const totalMinutes = Math.floor(video.duration / 60);
+        const totalSeconds = Math.floor(video.duration % 60);
+
+        timeDisplay.textContent = `${currentMinutes}:${currentSeconds
+          .toString()
+          .padStart(2, "0")} / ${totalMinutes}:${totalSeconds
+          .toString()
+          .padStart(2, "0")}`;
+      });
+
+      // Click on progress bar to seek
+      progressBar.addEventListener("click", (e) => {
+        const pos =
+          (e.pageX - progressBar.offsetLeft) / progressBar.offsetWidth;
+        video.currentTime = pos * video.duration;
+      });
+
+      // Keyboard controls
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          togglePlayPause();
+        }
+      });
+
+      // Handle video end
+      video.addEventListener("ended", () => {
+        playPauseBtn.textContent = "▶";
+      });
+    </script>
+  </body>
+</html>
